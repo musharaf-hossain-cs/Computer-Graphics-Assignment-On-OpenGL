@@ -201,39 +201,45 @@ void drawSS(){
 
 /// Task 1 Start
 
-/// Camera Position
+// Camera Position
 
 void moveForward(){
-    pos.x = pos.x - movementUnit;
-    pos.y = pos.y - movementUnit;
+    pos.x += l.x;
+    pos.y += l.y;
+    pos.z += l.z;
 }
 
 void moveBackward(){
-    pos.x = pos.x + movementUnit;
-    pos.y = pos.y + movementUnit;
+    pos.x -= l.x;
+    pos.y -= l.y;
+    pos.z -= l.z;
 }
 
 void moveRight(){
-    double sqDist = pos.x * pos.x + pos.y * pos.y;
-    pos.y = pos.y - movementUnit;
-    pos.x = sqrt(sqDist - pos.y * pos.y);
+    pos.x += r.x;
+    pos.y += r.y;
+    pos.z += r.z;
 }
 
 void moveLeft(){
-    double sqDist = pos.x * pos.x + pos.y * pos.y;
-    pos.y = pos.y + movementUnit;
-    pos.x = sqrt(sqDist - pos.y * pos.y);
+    pos.x -= r.x;
+    pos.y -= r.y;
+    pos.z -= r.z;
 }
 
 void pageUp(){
-    pos.z = pos.z - movementUnit;
+    pos.x += u.x;
+    pos.y += u.y;
+    pos.z += u.z;
 }
 
 void pageDown(){
-    pos.z = pos.z + movementUnit;
+    pos.x -= u.x;
+    pos.y -= u.y;
+    pos.z -= u.z;
 }
 
-/// Rotations
+// Rotations
 
 point rotateVectorCCW(point vect, point helper, double sign = 1.0){
     double rotatationSinA = sin(rotatationUnit);
@@ -318,7 +324,6 @@ void tiltCW(){
     r = tempR;
 }
 
-
 /// Task 1 End
 
 
@@ -390,7 +395,6 @@ void segmentedSphere(double radius, double dist, double precision = 32.0){
     glTranslatef(0,0,dist);
     sphereOneEighth(radius, precision, precision);
 }
-
 
 void cylinderOneForth(double radius, double height, int slices, int stacks, int lower = 0, int vert=0){
     struct point points[stacks + 1][slices + 1];
@@ -479,7 +483,6 @@ void segmentedCylinder(double radius, double height, double precision = 32.0){
     cylinderOneForth(radius, height, precision, precision,0,1);
 }
 
-
 void sixSquares(double side){
     glColor3f(1.0,1.0,1.0);
 
@@ -504,6 +507,8 @@ void sixSquares(double side){
 }
 
 /// Task 2 End
+
+
 
 void keyboardListener(unsigned char key, int x,int y){
 	switch(key){
@@ -532,7 +537,6 @@ void keyboardListener(unsigned char key, int x,int y){
 			break;
 	}
 }
-
 
 void specialKeyListener(int key, int x,int y){
 	switch(key){
@@ -582,7 +586,6 @@ void specialKeyListener(int key, int x,int y){
 	}
 }
 
-
 void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of the screen (2D)
 	switch(button){
 		case GLUT_LEFT_BUTTON:
@@ -606,7 +609,6 @@ void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of th
 			break;
 	}
 }
-
 
 void display(){
 
