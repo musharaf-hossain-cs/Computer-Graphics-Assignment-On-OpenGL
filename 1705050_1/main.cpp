@@ -15,10 +15,14 @@ double angle;
 double distance = 25.0;
 double shapeRadius = 12.5;
 
+double rotatationUnit = 0.035;
+double movementUnit = 2.0;
+
 struct point{
 	double x,y,z;
 };
 
+point pos, u, r, l;
 
 void drawAxes(){
 	if(drawaxes==1)
@@ -194,6 +198,132 @@ void drawSS(){
     glutSolidSphere(5,25,25);
 }
 
+
+/// Task 1 Start
+
+/// Camera Position
+
+void moveForward(){
+    pos.x = pos.x - movementUnit;
+    pos.y = pos.y - movementUnit;
+}
+
+void moveBackward(){
+    pos.x = pos.x + movementUnit;
+    pos.y = pos.y + movementUnit;
+}
+
+void moveRight(){
+    double sqDist = pos.x * pos.x + pos.y * pos.y;
+    pos.y = pos.y - movementUnit;
+    pos.x = sqrt(sqDist - pos.y * pos.y);
+}
+
+void moveLeft(){
+    double sqDist = pos.x * pos.x + pos.y * pos.y;
+    pos.y = pos.y + movementUnit;
+    pos.x = sqrt(sqDist - pos.y * pos.y);
+}
+
+void pageUp(){
+    pos.z = pos.z - movementUnit;
+}
+
+void pageDown(){
+    pos.z = pos.z + movementUnit;
+}
+
+/// Rotations
+
+point rotateVectorCCW(point vect, point helper, double sign = 1.0){
+    double rotatationSinA = sin(rotatationUnit);
+    double rotatationCosA = cos(rotatationUnit);
+
+    point temp;
+    // perp(vect) is helper
+    point perpVectsinA;
+    point vectCosA;
+
+    perpVectsinA.x = helper.x * rotatationSinA * sign;
+    perpVectsinA.y = helper.y * rotatationSinA * sign;
+    perpVectsinA.z = helper.z * rotatationSinA * sign;
+
+    vectCosA.x = vect.x * rotatationCosA;
+    vectCosA.y = vect.y * rotatationCosA;
+    vectCosA.z = vect.z * rotatationCosA;
+
+    temp.x = perpVectsinA.x + vectCosA.x;
+    temp.y = perpVectsinA.y + vectCosA.y;
+    temp.z = perpVectsinA.z + vectCosA.z;
+
+    return temp;
+}
+
+point rotateVectorCW(point vect, point helper, double sign = 1.0){
+    double rotatationSinA = sin(-rotatationUnit);
+    double rotatationCosA = cos(-rotatationUnit);
+    point temp;
+    // perp(vect) is helper
+    point perpVectsinA;
+    point vectCosA;
+
+    perpVectsinA.x = helper.x * rotatationSinA * sign;
+    perpVectsinA.y = helper.y * rotatationSinA * sign;
+    perpVectsinA.z = helper.z * rotatationSinA * sign;
+
+    vectCosA.x = vect.x * rotatationCosA;
+    vectCosA.y = vect.y * rotatationCosA;
+    vectCosA.z = vect.z * rotatationCosA;
+
+    temp.x = perpVectsinA.x + vectCosA.x;
+    temp.y = perpVectsinA.y + vectCosA.y;
+    temp.z = perpVectsinA.z + vectCosA.z;
+
+    return temp;
+}
+
+void lookLeft(){
+    point tempR = rotateVectorCCW(r,l);
+    l = rotateVectorCCW(l,r,-1.0);
+    r = tempR;
+}
+
+void lookRight(){
+    point tempL = rotateVectorCW(l,r,-1.0);
+    r = rotateVectorCW(r,l);
+    l = tempL;
+}
+
+void lookUp(){
+    point tempL = rotateVectorCCW(l,u);
+    u = rotateVectorCCW(u,l,-1.0);
+    l = tempL;
+}
+
+void lookDown(){
+    point tempU = rotateVectorCW(u,l,-1.0);
+    l = rotateVectorCW(l,u);
+    u = tempU;
+}
+
+void tiltCCW(){
+    point tempU = rotateVectorCCW(u,r);
+    r = rotateVectorCCW(r,u,-1.0);
+    u = tempU;
+}
+
+void tiltCW(){
+    point tempR = rotateVectorCW(r,u,-1.0);
+    u = rotateVectorCW(u,r);
+    r = tempR;
+}
+
+
+/// Task 1 End
+
+
+
+/// Task 2 Start
 
 void sphereOneEighth(double radius, int slices, int stacks, int lower = 0){
     struct point points[stacks + 1][slices + 1];
@@ -373,12 +503,30 @@ void sixSquares(double side){
     drawSquare(side);
 }
 
+/// Task 2 End
+
 void keyboardListener(unsigned char key, int x,int y){
 	switch(key){
 
 		case '1':
-			drawgrid=1-drawgrid;
+			lookLeft();
 			break;
+        case '2':
+            lookRight();
+            break;
+        case '3':
+            lookUp();
+            break;
+        case '4':
+            lookDown();
+            break;
+        case '5':
+            tiltCCW();
+            break;
+        case '6':
+            tiltCW();
+            break;
+
 
 		default:
 			break;
@@ -389,22 +537,24 @@ void keyboardListener(unsigned char key, int x,int y){
 void specialKeyListener(int key, int x,int y){
 	switch(key){
 		case GLUT_KEY_DOWN:		//down arrow key
-			cameraHeight -= 3.0;
+			moveBackward();
 			break;
 		case GLUT_KEY_UP:		// up arrow key
-			cameraHeight += 3.0;
+			moveForward();
 			break;
 
 		case GLUT_KEY_RIGHT:
-			cameraAngle += 0.03;
+			moveRight();
 			break;
 		case GLUT_KEY_LEFT:
-			cameraAngle -= 0.03;
+			moveLeft();
 			break;
 
 		case GLUT_KEY_PAGE_UP:
+		    pageUp();
 			break;
 		case GLUT_KEY_PAGE_DOWN:
+		    pageDown();
 			break;
 
 		case GLUT_KEY_INSERT:
@@ -480,8 +630,13 @@ void display(){
 	//3. Which direction is the camera's UP direction?
 
 	//gluLookAt(100,100,100,	0,0,0,	0,0,1);
-	gluLookAt(80*cos(cameraAngle), 80*sin(cameraAngle), cameraHeight,		0,0,0,		0,0,1);
+	//gluLookAt(80*cos(cameraAngle), 80*sin(cameraAngle), cameraHeight,		0,0,0,		0,0,1);
 	//gluLookAt(0,0,200,	0,0,0,	0,1,0);
+	gluLookAt(
+           pos.x, pos.y, pos.z,
+           pos.x + l.x, pos.y + l.y, pos.z + l.z,
+           u.x, u.y, u.z
+           );
 
 
 	//again select MODEL-VIEW
@@ -498,10 +653,9 @@ void display(){
 
     glPushMatrix();
     segmentedSphere(shapeRadius, distance);
-
     segmentedCylinder(shapeRadius, distance);
-
     glPopMatrix();
+
     sixSquares(distance);
 
     //glColor3f(1,0,0);
@@ -536,6 +690,22 @@ void init(){
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
+
+	pos.x = 100;
+	pos.y = 100;
+	pos.z = 0;
+
+	u.x = 0;
+	u.y = 0;
+	u.z = 1;
+
+	r.x = - 1/sqrt(2.0);
+	r.y = 1/sqrt(2.0);
+	r.z = 0;
+
+	l.x = - 1/sqrt(2.0);
+	l.y = - 1/sqrt(2.0);
+	l.z = 0;
 
 	//clear the screen
 	glClearColor(0,0,0,0);
