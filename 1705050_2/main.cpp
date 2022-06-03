@@ -24,9 +24,22 @@ double xMax = 200, xMin = -200;
 double yMax = 200, yMin = -200;
 double planeZ = -wheelRadius;
 
+point moveDirection;
+point rotationAxis;
+point verticalAxis;
+
+point newOrigin;
+
+double rotationAngel = 0;
+double rotationUnit = 5;
+double translationUnit;
+double directionChange = 0;
 
 
 
+void printPoint(point p){
+    printf("%lf %lf %lf\n",p.x,p.y,p.z);
+}
 
 void drawAxes()
 {
@@ -206,6 +219,71 @@ void drawSS()
 }
 
 
+point rotateVectorCCW(point vect, point helper, double sign = 1.0){
+    double rotationSinA = sin(rotationUnit*pi/180);
+    double rotationCosA = cos(rotationUnit*pi/180);
+
+    point temp;
+    // perp(vect) is helper
+    point perpVectsinA;
+    point vectCosA;
+
+    perpVectsinA.x = helper.x * rotationSinA * sign;
+    perpVectsinA.y = helper.y * rotationSinA * sign;
+    perpVectsinA.z = helper.z * rotationSinA * sign;
+
+    vectCosA.x = vect.x * rotationCosA;
+    vectCosA.y = vect.y * rotationCosA;
+    vectCosA.z = vect.z * rotationCosA;
+
+    temp.x = perpVectsinA.x + vectCosA.x;
+    temp.y = perpVectsinA.y + vectCosA.y;
+    temp.z = perpVectsinA.z + vectCosA.z;
+
+    return temp;
+}
+
+point rotateVectorCW(point vect, point helper, double sign = 1.0){
+    double rotationSinA = sin(-rotationUnit*pi/180);
+    double rotationCosA = cos(-rotationUnit*pi/180);
+    point temp;
+    // perp(vect) is helper
+    point perpVectsinA;
+    point vectCosA;
+
+    perpVectsinA.x = helper.x * rotationSinA * sign;
+    perpVectsinA.y = helper.y * rotationSinA * sign;
+    perpVectsinA.z = helper.z * rotationSinA * sign;
+
+    vectCosA.x = vect.x * rotationCosA;
+    vectCosA.y = vect.y * rotationCosA;
+    vectCosA.z = vect.z * rotationCosA;
+
+    temp.x = perpVectsinA.x + vectCosA.x;
+    temp.y = perpVectsinA.y + vectCosA.y;
+    temp.z = perpVectsinA.z + vectCosA.z;
+
+    return temp;
+}
+
+void moveRight(){
+    directionChange += rotationUnit;
+    point temp = rotateVectorCW(rotationAxis, moveDirection, -1.0);
+    moveDirection = rotateVectorCW(moveDirection, rotationAxis);
+    rotationAxis = temp;
+    //printPoint(moveDirection);
+    printPoint(rotationAxis);
+}
+
+void moveLeft(){
+    directionChange -= rotationUnit;
+    point temp = rotateVectorCCW(moveDirection, rotationAxis);
+    rotationAxis = rotateVectorCCW(rotationAxis, moveDirection,-1.0);
+    moveDirection = temp;
+    //printPoint(moveDirection);
+    printPoint(rotationAxis);
+}
+
 void drawPlane(){
     point points[2][25];
     for(int i=0;i<=20;i++){
@@ -259,9 +337,19 @@ void drawCylinder(double radius, double height, int slices, int stacks){
 	//draw quads using generated points
 	for(i=0;i<stacks;i++)
 	{
-        glColor3f((double)i/(double)stacks, (double)i/(double)stacks, (double)i/(double)stacks);
+        //glColor3f((double)i/(double)stacks, (double)i/(double)stacks, (double)i/(double)stacks);
 		for(j=0;j<slices;j++)
 		{
+		    double colorSegment;
+		    if(j < slices/2){
+                colorSegment = 2.0*(double)j/(double)slices;
+		    }
+		    else{
+                colorSegment = 2.0*(1 - (double)j/(double)slices);
+		    }
+
+		    glColor3f(colorSegment,colorSegment,colorSegment);
+
 			glBegin(GL_QUADS);{
 			    //upper hemisphere
 				glVertex3f(points[i][j].x,points[i][j].y, points[i][j].z);
@@ -311,6 +399,24 @@ void keyboardListener(unsigned char key, int x,int y){
 		case '1':
 			drawgrid=1-drawgrid;
 			break;
+        case 'w':
+            rotationAngel += rotationUnit;
+            newOrigin.x += moveDirection.x * translationUnit;
+            newOrigin.y += moveDirection.y * translationUnit;
+            newOrigin.z += moveDirection.z * translationUnit;
+            break;
+        case 's':
+            rotationAngel -= rotationUnit;
+            newOrigin.x -= moveDirection.x * translationUnit;
+            newOrigin.y -= moveDirection.y * translationUnit;
+            newOrigin.z -= moveDirection.z * translationUnit;
+            break;
+        case 'd':
+            moveRight();
+            break;
+        case 'a':
+            moveLeft();
+            break;
 
 		default:
 			break;
@@ -410,13 +516,26 @@ void display(){
 	****************************/
 	//add objects
 
-	//drawAxes();
+	drawAxes();
 	//drawGrid();
 
     //glColor3f(1,0,0);
     //drawSquare(10);
 
+
     drawPlane();
+
+    /// move wheel center
+    glTranslatef(0,-wheelWidth/2,0);
+
+    ///translation
+    glTranslatef(newOrigin.x, newOrigin.y, newOrigin.z);
+    ///rotation
+    glRotatef(rotationAngel, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+
+    /// direction change
+    glRotatef(directionChange,0,0,1);
+
     drawWheel();
 
     //drawSS();
@@ -446,6 +565,25 @@ void init(){
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
+
+	newOrigin.x = 0;
+	newOrigin.y = 0;
+	newOrigin.z = 0;
+
+	moveDirection.x = 1;
+	moveDirection.y = 0;
+	moveDirection.z = 0;
+
+	rotationAxis.x = 0;
+	rotationAxis.y = 1;
+	rotationAxis.z = 0;
+
+	verticalAxis.x = 0;
+	verticalAxis.y = 0;
+	verticalAxis.z = 1;
+
+	//calculate translation unit
+	translationUnit = rotationUnit / 360.0 * 2.0 * pi * wheelRadius;
 
 	//clear the screen
 	glClearColor(0,0,0,0);
