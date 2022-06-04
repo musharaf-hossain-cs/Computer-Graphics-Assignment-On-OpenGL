@@ -15,7 +15,7 @@ double angle;
 double distance = 25.0;
 double shapeRadius = 12.5;
 
-double rotatationUnit = 0.035;
+double rotationUnit = 0.035;
 double movementUnit = 2.0;
 
 struct point{
@@ -242,21 +242,21 @@ void pageDown(){
 // Rotations
 
 point rotateVectorCCW(point vect, point helper, double sign = 1.0){
-    double rotatationSinA = sin(rotatationUnit);
-    double rotatationCosA = cos(rotatationUnit);
+    double rotationSinA = sin(rotationUnit);
+    double rotationCosA = cos(rotationUnit);
 
     point temp;
     // perp(vect) is helper
     point perpVectsinA;
     point vectCosA;
 
-    perpVectsinA.x = helper.x * rotatationSinA * sign;
-    perpVectsinA.y = helper.y * rotatationSinA * sign;
-    perpVectsinA.z = helper.z * rotatationSinA * sign;
+    perpVectsinA.x = helper.x * rotationSinA * sign;
+    perpVectsinA.y = helper.y * rotationSinA * sign;
+    perpVectsinA.z = helper.z * rotationSinA * sign;
 
-    vectCosA.x = vect.x * rotatationCosA;
-    vectCosA.y = vect.y * rotatationCosA;
-    vectCosA.z = vect.z * rotatationCosA;
+    vectCosA.x = vect.x * rotationCosA;
+    vectCosA.y = vect.y * rotationCosA;
+    vectCosA.z = vect.z * rotationCosA;
 
     temp.x = perpVectsinA.x + vectCosA.x;
     temp.y = perpVectsinA.y + vectCosA.y;
@@ -266,20 +266,20 @@ point rotateVectorCCW(point vect, point helper, double sign = 1.0){
 }
 
 point rotateVectorCW(point vect, point helper, double sign = 1.0){
-    double rotatationSinA = sin(-rotatationUnit);
-    double rotatationCosA = cos(-rotatationUnit);
+    double rotationSinA = sin(-rotationUnit);
+    double rotationCosA = cos(-rotationUnit);
     point temp;
     // perp(vect) is helper
     point perpVectsinA;
     point vectCosA;
 
-    perpVectsinA.x = helper.x * rotatationSinA * sign;
-    perpVectsinA.y = helper.y * rotatationSinA * sign;
-    perpVectsinA.z = helper.z * rotatationSinA * sign;
+    perpVectsinA.x = helper.x * rotationSinA * sign;
+    perpVectsinA.y = helper.y * rotationSinA * sign;
+    perpVectsinA.z = helper.z * rotationSinA * sign;
 
-    vectCosA.x = vect.x * rotatationCosA;
-    vectCosA.y = vect.y * rotatationCosA;
-    vectCosA.z = vect.z * rotatationCosA;
+    vectCosA.x = vect.x * rotationCosA;
+    vectCosA.y = vect.y * rotationCosA;
+    vectCosA.z = vect.z * rotationCosA;
 
     temp.x = perpVectsinA.x + vectCosA.x;
     temp.y = perpVectsinA.y + vectCosA.y;

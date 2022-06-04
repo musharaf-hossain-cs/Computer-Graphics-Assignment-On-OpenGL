@@ -267,21 +267,21 @@ point rotateVectorCW(point vect, point helper, double sign = 1.0){
 }
 
 void moveRight(){
-    directionChange += rotationUnit;
+    directionChange -= rotationUnit;
     point temp = rotateVectorCW(rotationAxis, moveDirection, -1.0);
     moveDirection = rotateVectorCW(moveDirection, rotationAxis);
     rotationAxis = temp;
     //printPoint(moveDirection);
-    printPoint(rotationAxis);
+    //printPoint(rotationAxis);
 }
 
 void moveLeft(){
-    directionChange -= rotationUnit;
+    directionChange += rotationUnit;
     point temp = rotateVectorCCW(moveDirection, rotationAxis);
     rotationAxis = rotateVectorCCW(rotationAxis, moveDirection,-1.0);
     moveDirection = temp;
     //printPoint(moveDirection);
-    printPoint(rotationAxis);
+    //printPoint(rotationAxis);
 }
 
 void drawPlane(){
@@ -516,7 +516,7 @@ void display(){
 	****************************/
 	//add objects
 
-	drawAxes();
+	//drawAxes();
 	//drawGrid();
 
     //glColor3f(1,0,0);
@@ -525,17 +525,19 @@ void display(){
 
     drawPlane();
 
-    /// move wheel center
-    glTranslatef(0,-wheelWidth/2,0);
+
 
     ///translation
     glTranslatef(newOrigin.x, newOrigin.y, newOrigin.z);
+
     ///rotation
     glRotatef(rotationAngel, rotationAxis.x, rotationAxis.y, rotationAxis.z);
 
     /// direction change
     glRotatef(directionChange,0,0,1);
 
+    /// move wheel center
+    glTranslatef(0,-wheelWidth/2,0);
     drawWheel();
 
     //drawSS();
